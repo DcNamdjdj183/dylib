@@ -1,34 +1,47 @@
 #import <UIKit/UIKit.h>
 
-@interface MTLumaDodgePillView : UIView
-@end
+%hook UIWindow
 
-%hook MTLumaDodgePillView
-
-- (void)didMoveToWindow {
+- (void)makeKeyWindow {
     %orig;
-    if (self.window) {
+    
+    // Chỉ thêm vào window chính của app, tránh thêm vào bàn phím hay các window hệ thống phụ
+    if (CGRectEqualToRect(self.bounds, [UIScreen mainScreen].bounds)) {
         UILabel *rainbowLabel = (UILabel *)[self viewWithTag:9999];
         if (!rainbowLabel) {
-            // Cho phép text hiển thị tràn ra ngoài viền của pill (vì pill rất mỏng)
-            self.clipsToBounds = NO;
+            CGFloat width = self.bounds.size.width;
+            CGFloat height = self.bounds.size.height;
             
-            // Tạo label với kích thước rộng hơn pill một chút để chứa đủ chữ
-            CGFloat width = [UIScreen mainScreen].bounds.size.width;
-            rainbowLabel = [[UILabel alloc] initWithFrame:CGRectMake((self.bounds.size.width - width) / 2.0, -15, width, 30)];
-            rainbowLabel.text = [NSString stringWithUTF8String:"Bản quyền thuộc về admin DNXTWEAKS IOS - Liên Hệ 0395109314"];
+            // Lấy safeAreaInsets.bottom (chỗ màn hình khuyết của home bar)
+            CGFloat bottomPadding = self.safeAreaInsets.bottom;
+            if (bottomPadding == 0) {
+                // Nếu là máy không có tai thỏ/home bar (như iPhone 8), dùng padding mặc định
+                bottomPadding = 15;
+            }
+            
+            CGFloat labelHeight = 25;
+            // Căn yPos để nằm ngay trên thanh home bar
+            CGFloat yPos = height - bottomPadding - labelHeight + 10;
+            
+            rainbowLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, yPos, width, labelHeight)];
+            
+            // Text mới theo ảnh của bạn
+            rainbowLabel.text = [NSString stringWithUTF8String:"Copyright DucNamTweaks Zalo 0395109314"];
             rainbowLabel.textAlignment = NSTextAlignmentCenter;
             rainbowLabel.font = [UIFont boldSystemFontOfSize:12];
             rainbowLabel.tag = 9999;
-            rainbowLabel.adjustsFontSizeToFitWidth = YES;
-            rainbowLabel.minimumScaleFactor = 0.5;
+            // Cho phép user chạm xuyên qua chữ, không chặn thao tác lướt
+            rainbowLabel.userInteractionEnabled = NO;
+            
+            // Đổ bóng để dễ đọc trên nền trắng/sáng
+            rainbowLabel.layer.shadowColor = [UIColor blackColor].CGColor;
+            rainbowLabel.layer.shadowOffset = CGSizeMake(0.5, 0.5);
+            rainbowLabel.layer.shadowOpacity = 0.5;
+            rainbowLabel.layer.shadowRadius = 0.5;
             
             [self addSubview:rainbowLabel];
             
-            // Ẩn thanh home mặc định đi một chút nếu muốn (hoặc giữ nguyên)
-            // self.backgroundColor = [UIColor clearColor]; // Bỏ comment nếu muốn ẩn thanh ngang
-            
-            // Tạo hiệu ứng cầu vồng
+            // Hiệu ứng màu cầu vồng
             CAKeyframeAnimation *colorAnim = [CAKeyframeAnimation animationWithKeyPath:@"foregroundColor"];
             UIColor *c1 = [UIColor redColor];
             UIColor *c2 = [UIColor orangeColor];
@@ -55,6 +68,9 @@
             
             [rainbowLabel.layer addAnimation:colorAnim forKey:@"rainbowColor"];
         }
+        
+        // Đảm bảo chữ luôn hiển thị nổi lên trên cùng (kể cả khi app render UI đè lên)
+        [self bringSubviewToFront:rainbowLabel];
     }
 }
 
