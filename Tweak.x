@@ -11,42 +11,48 @@
             rainbowLabel = [[UILabel alloc] init];
             rainbowLabel.text = [NSString stringWithUTF8String:"Copyright DucNamTweaks Zalo 0395109314"];
             rainbowLabel.textAlignment = NSTextAlignmentCenter;
-            rainbowLabel.font = [UIFont boldSystemFontOfSize:12];
+            rainbowLabel.font = [UIFont boldSystemFontOfSize:13];
             rainbowLabel.tag = 9999;
             rainbowLabel.userInteractionEnabled = NO;
+            rainbowLabel.adjustsFontSizeToFitWidth = YES;
             
+            // Đổ bóng chữ sắc nét
             rainbowLabel.layer.shadowColor = [UIColor blackColor].CGColor;
-            rainbowLabel.layer.shadowOffset = CGSizeMake(0.5, 0.5);
-            rainbowLabel.layer.shadowOpacity = 0.5;
-            rainbowLabel.layer.shadowRadius = 0.5;
+            rainbowLabel.layer.shadowOffset = CGSizeMake(1.0, 1.0);
+            rainbowLabel.layer.shadowOpacity = 0.8;
+            rainbowLabel.layer.shadowRadius = 1.0;
             
             [self addSubview:rainbowLabel];
             
-            CAKeyframeAnimation *colorAnim = [CAKeyframeAnimation animationWithKeyPath:@"foregroundColor"];
-            UIColor *c1 = [UIColor redColor];
-            UIColor *c2 = [UIColor orangeColor];
-            UIColor *c3 = [UIColor yellowColor];
-            UIColor *c4 = [UIColor greenColor];
-            UIColor *c5 = [UIColor blueColor];
-            UIColor *c6 = [UIColor purpleColor];
-            UIColor *c7 = [UIColor redColor];
-            
-            colorAnim.values = @[
-                (id)c1.CGColor,
-                (id)c2.CGColor,
-                (id)c3.CGColor,
-                (id)c4.CGColor,
-                (id)c5.CGColor,
-                (id)c6.CGColor,
-                (id)c7.CGColor
-            ];
-            
-            colorAnim.duration = 3.0;
-            colorAnim.repeatCount = HUGE_VALF;
-            colorAnim.calculationMode = kCAAnimationLinear;
-            colorAnim.removedOnCompletion = NO;
-            
-            [rainbowLabel.layer addAnimation:colorAnim forKey:@"rainbowColor"];
+            // Khởi tạo NSTimer để liên tục đổi màu chữ (Rainbow Effect)
+            __weak UILabel *weakLabel = rainbowLabel;
+            [NSTimer scheduledTimerWithTimeInterval:0.5 repeats:YES block:^(NSTimer * _Nonnull timer) {
+                UILabel *strongLabel = weakLabel;
+                if (!strongLabel || !strongLabel.superview) {
+                    [timer invalidate];
+                    return;
+                }
+                
+                static int colorIndex = 0;
+                NSArray *colors = @[
+                    [UIColor colorWithRed:1.0 green:0.2 blue:0.2 alpha:1.0], // Red
+                    [UIColor colorWithRed:1.0 green:0.6 blue:0.0 alpha:1.0], // Orange
+                    [UIColor colorWithRed:1.0 green:0.9 blue:0.0 alpha:1.0], // Yellow
+                    [UIColor colorWithRed:0.2 green:0.9 blue:0.2 alpha:1.0], // Green
+                    [UIColor colorWithRed:0.2 green:0.6 blue:1.0 alpha:1.0], // Blue
+                    [UIColor colorWithRed:0.6 green:0.2 blue:1.0 alpha:1.0], // Purple
+                    [UIColor colorWithRed:1.0 green:0.4 blue:0.7 alpha:1.0]  // Pink
+                ];
+                
+                [UIView transitionWithView:strongLabel
+                                  duration:0.5
+                                   options:UIViewAnimationOptionTransitionCrossDissolve | UIViewAnimationOptionAllowUserInteraction
+                                animations:^{
+                    strongLabel.textColor = colors[colorIndex % colors.count];
+                } completion:nil];
+                
+                colorIndex++;
+            }];
         }
     }
 }
@@ -63,7 +69,6 @@
             bottomPadding = 15;
         }
         CGFloat labelHeight = 25;
-        // Tọa độ yPos tính toán tự động mỗi khi xoay máy hoặc load UI
         CGFloat yPos = height - bottomPadding - labelHeight + 10;
         
         rainbowLabel.frame = CGRectMake(0, yPos, width, labelHeight);
