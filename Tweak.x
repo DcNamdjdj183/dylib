@@ -1,43 +1,35 @@
 #import <UIKit/UIKit.h>
 
-// --- Cấu hình Bản Quyền ---
-static BOOL hasShownCopyright = NO;
+@interface MTLumaDodgePillView : UIView
+@end
 
-%hook UIApplication
-
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    %orig;
-    if (!hasShownCopyright) {
-        hasShownCopyright = YES;
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithUTF8String:"Thông Báo"]
-                                                                           message:[NSString stringWithUTF8String:"Bản quyền thuộc về admin DNXTWEAKS IOS - Liên Hệ 0395109314"]
-                                                                    preferredStyle:UIAlertControllerStyleAlert];
-            UIAlertAction *okAction = [UIAlertAction actionWithTitle:[NSString stringWithUTF8String:"Đã rõ"]
-                                                               style:UIAlertActionStyleDefault
-                                                             handler:nil];
-            [alert addAction:okAction];
-            
-            UIViewController *rootVC = [application keyWindow].rootViewController;
-            if (rootVC) {
-                [rootVC presentViewController:alert animated:YES completion:nil];
-            }
-        });
-    }
-}
-
-%end
-
-// --- Cấu hình Chữ Rainbow ---
-%hook UILabel
+%hook MTLumaDodgePillView
 
 - (void)didMoveToWindow {
     %orig;
     if (self.window) {
-        if (![self.layer animationForKey:@"rainbowColor"]) {
-            CAKeyframeAnimation *colorAnim = [CAKeyframeAnimation animationWithKeyPath:@"foregroundColor"];
+        UILabel *rainbowLabel = (UILabel *)[self viewWithTag:9999];
+        if (!rainbowLabel) {
+            // Cho phép text hiển thị tràn ra ngoài viền của pill (vì pill rất mỏng)
+            self.clipsToBounds = NO;
             
+            // Tạo label với kích thước rộng hơn pill một chút để chứa đủ chữ
+            CGFloat width = [UIScreen mainScreen].bounds.size.width;
+            rainbowLabel = [[UILabel alloc] initWithFrame:CGRectMake((self.bounds.size.width - width) / 2.0, -15, width, 30)];
+            rainbowLabel.text = [NSString stringWithUTF8String:"Bản quyền thuộc về admin DNXTWEAKS IOS - Liên Hệ 0395109314"];
+            rainbowLabel.textAlignment = NSTextAlignmentCenter;
+            rainbowLabel.font = [UIFont boldSystemFontOfSize:12];
+            rainbowLabel.tag = 9999;
+            rainbowLabel.adjustsFontSizeToFitWidth = YES;
+            rainbowLabel.minimumScaleFactor = 0.5;
+            
+            [self addSubview:rainbowLabel];
+            
+            // Ẩn thanh home mặc định đi một chút nếu muốn (hoặc giữ nguyên)
+            // self.backgroundColor = [UIColor clearColor]; // Bỏ comment nếu muốn ẩn thanh ngang
+            
+            // Tạo hiệu ứng cầu vồng
+            CAKeyframeAnimation *colorAnim = [CAKeyframeAnimation animationWithKeyPath:@"foregroundColor"];
             UIColor *c1 = [UIColor redColor];
             UIColor *c2 = [UIColor orangeColor];
             UIColor *c3 = [UIColor yellowColor];
@@ -61,7 +53,7 @@ static BOOL hasShownCopyright = NO;
             colorAnim.calculationMode = kCAAnimationLinear;
             colorAnim.removedOnCompletion = NO;
             
-            [self.layer addAnimation:colorAnim forKey:@"rainbowColor"];
+            [rainbowLabel.layer addAnimation:colorAnim forKey:@"rainbowColor"];
         }
     }
 }
