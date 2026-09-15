@@ -1,0 +1,34 @@
+﻿name: Build Theos Tweak
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Install Theos and iOS SDK
+        run: |
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
+          git clone https://github.com/theos/sdks.git $THEOS/sdks
+        env:
+          THEOS: /Users/runner/theos
+          
+      - name: Build package
+        run: |
+          make package FINALPACKAGE=1
+        env:
+          THEOS: /Users/runner/theos
+          
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tweak-deb
+          path: packages/*.deb

@@ -1,0 +1,9 @@
+﻿Package: com.dnxtweaks.rainbowtext
+Name: RainbowText
+Depends: mobilesubstrate
+Version: 1.0
+Architecture: iphoneos-arm
+Description: Chữ rainbow - Bản quyền thuộc về admin DNXTWEAKS IOS - Liên Hệ 0395109314
+Maintainer: DNXTWEAKS IOS
+Author: DNXTWEAKS IOS
+Section: Tweaks
