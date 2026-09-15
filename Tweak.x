@@ -1,4 +1,4 @@
-﻿#import <UIKit/UIKit.h>
+#import <UIKit/UIKit.h>
 
 // --- Cấu hình Bản Quyền ---
 static BOOL hasShownCopyright = NO;
@@ -11,10 +11,10 @@ static BOOL hasShownCopyright = NO;
         hasShownCopyright = YES;
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Thông Báo"
-                                                                           message:@"Bản quyền thuộc về admin DNXTWEAKS IOS - Liên Hệ 0395109314"
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithUTF8String:"Thông Báo"]
+                                                                           message:[NSString stringWithUTF8String:"Bản quyền thuộc về admin DNXTWEAKS IOS - Liên Hệ 0395109314"]
                                                                     preferredStyle:UIAlertControllerStyleAlert];
-            UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Đã rõ"
+            UIAlertAction *okAction = [UIAlertAction actionWithTitle:[NSString stringWithUTF8String:"Đã rõ"]
                                                                style:UIAlertActionStyleDefault
                                                              handler:nil];
             [alert addAction:okAction];
