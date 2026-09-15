@@ -16,7 +16,6 @@
             rainbowLabel.userInteractionEnabled = NO;
             rainbowLabel.adjustsFontSizeToFitWidth = YES;
             
-            // Đổ bóng chữ sắc nét
             rainbowLabel.layer.shadowColor = [UIColor blackColor].CGColor;
             rainbowLabel.layer.shadowOffset = CGSizeMake(1.0, 1.0);
             rainbowLabel.layer.shadowOpacity = 0.8;
@@ -24,7 +23,6 @@
             
             [self addSubview:rainbowLabel];
             
-            // Khởi tạo NSTimer để liên tục đổi màu chữ (Rainbow Effect)
             __weak UILabel *weakLabel = rainbowLabel;
             [NSTimer scheduledTimerWithTimeInterval:0.5 repeats:YES block:^(NSTimer * _Nonnull timer) {
                 UILabel *strongLabel = weakLabel;
@@ -64,14 +62,27 @@
     if (rainbowLabel) {
         CGFloat width = self.bounds.size.width;
         CGFloat height = self.bounds.size.height;
-        CGFloat bottomPadding = self.safeAreaInsets.bottom;
-        if (bottomPadding == 0) {
-            bottomPadding = 15;
-        }
         CGFloat labelHeight = 25;
-        CGFloat yPos = height - bottomPadding - labelHeight + 10;
         
-        rainbowLabel.frame = CGRectMake(0, yPos, width, labelHeight);
+        if (width > height) {
+            // Màn hình ngang (Landscape) -> Đưa lên phía trên
+            CGFloat topPadding = self.safeAreaInsets.top;
+            if (topPadding == 0) {
+                topPadding = 15; 
+            }
+            // Đưa lên góc trên (sát mép trên)
+            CGFloat yPos = topPadding;
+            rainbowLabel.frame = CGRectMake(0, yPos, width, labelHeight);
+        } else {
+            // Màn hình dọc (Portrait) -> Ở dưới cùng thanh Home Bar
+            CGFloat bottomPadding = self.safeAreaInsets.bottom;
+            if (bottomPadding == 0) {
+                bottomPadding = 15;
+            }
+            CGFloat yPos = height - bottomPadding - labelHeight + 10;
+            rainbowLabel.frame = CGRectMake(0, yPos, width, labelHeight);
+        }
+        
         [self bringSubviewToFront:rainbowLabel];
     }
 }
