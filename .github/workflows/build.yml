@@ -17,9 +17,9 @@ jobs:
       - name: Install Theos and iOS SDK
         run: |
           bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
-          git clone https://github.com/theos/sdks.git $THEOS/sdks
         env:
           THEOS: /Users/runner/theos
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Build package
         run: |
